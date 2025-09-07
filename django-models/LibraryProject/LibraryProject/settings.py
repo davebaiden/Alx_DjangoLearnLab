@@ -56,8 +56,7 @@ ROOT_URLCONF = 'LibraryProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # Added your app templates folder here
-        'DIRS': [BASE_DIR / 'relationship_app' / 'templates'],
+        'DIRS': [BASE_DIR / 'relationship_app' / 'templates'],  # app templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,6 +67,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'LibraryProject.wsgi.application'
 
