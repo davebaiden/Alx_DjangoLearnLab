@@ -1,5 +1,6 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView 
+from django.contrib.auth.views import LogoutView
 from .views import list_books
 from .views import LibraryDetailView
 from .views import register_view
