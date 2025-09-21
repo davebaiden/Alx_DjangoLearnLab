@@ -3,6 +3,7 @@ from .models import Book
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
+
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
@@ -17,3 +18,11 @@ class BookForm(forms.ModelForm):
 
 class BookSearchForm(forms.Form):
     q = forms.CharField(max_length=100, required=False)
+
+
+# ------------------------------
+# Example Form (for requirement)
+# ------------------------------
+class ExampleForm(forms.Form):
+    name = forms.CharField(max_length=100, required=True, label="Name")
+    email = forms.EmailField(required=True, label="Email")
