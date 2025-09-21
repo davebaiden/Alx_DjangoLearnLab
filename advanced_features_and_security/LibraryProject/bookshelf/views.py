@@ -2,8 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_http_methods
 from .models import Book
-from .forms import BookForm, BookSearchForm, ExampleForm  # ✅ Added ExampleForm
-
+from .forms import BookForm, BookSearchForm, ExampleForm  # ✅ Now correctly imported
 
 @permission_required("bookshelf.can_view", raise_exception=True)
 def book_list(request):
@@ -13,8 +12,7 @@ def book_list(request):
     if form.is_valid():
         q = form.cleaned_data.get("q")
         if q:
-            # safe ORM-based filtering (prevents SQL injection)
-            books = books.filter(title__icontains=q)  # parameterized by ORM
+            books = books.filter(title__icontains=q)  # ORM prevents SQL injection
     return render(request, "bookshelf/book_list.html", {"books": books, "form": form})
 
 
@@ -25,7 +23,6 @@ def create_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save(commit=False)
-            # if you want added_by to be request.user by default:
             if not book.added_by_id:
                 book.added_by = request.user
             book.save()
