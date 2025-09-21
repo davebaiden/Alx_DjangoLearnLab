@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "bookshelf",
     "relationship_app",
     "csp",
+    "django_extensions",  # enable runserver_plus
 ]
 
 
