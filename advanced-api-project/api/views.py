@@ -5,25 +5,25 @@ from .serializers import BookSerializer
 import datetime
 
 
-# List all books
+# List all books (open to everyone)
 class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]  # 👈 explicit
 
 
-# Retrieve a single book by ID
+# Retrieve a single book by ID (open to everyone)
 class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]  # 👈 explicit
 
 
-# Create a new book
+# Create a new book (only authenticated users)
 class BookCreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # 👈 explicit
 
     def perform_create(self, serializer):
         """Validate publication_year before creating"""
@@ -34,11 +34,11 @@ class BookCreateView(generics.CreateAPIView):
         serializer.save()
 
 
-# Update an existing book
+# Update an existing book (only authenticated users)
 class BookUpdateView(generics.UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # 👈 explicit
 
     def perform_update(self, serializer):
         """Validate publication_year before updating"""
@@ -49,8 +49,8 @@ class BookUpdateView(generics.UpdateAPIView):
         serializer.save()
 
 
-# Delete a book
+# Delete a book (only authenticated users)
 class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # 👈 explicit
