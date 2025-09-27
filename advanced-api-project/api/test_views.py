@@ -8,10 +8,8 @@ from .models import Book
 
 class BookAPITests(APITestCase):
     def setUp(self):
-        # Create test user and token
+        # Create test user
         self.user = User.objects.create_user(username="testuser", password="password123")
-        self.token = Token.objects.create(user=self.user)
-        self.auth_headers = {"HTTP_AUTHORIZATION": f"Token {self.token.key}"}
 
         # Create sample books
         self.book1 = Book.objects.create(title="Book A", author="Author X", publication_year=2001)
@@ -24,6 +22,8 @@ class BookAPITests(APITestCase):
         self.update_url = reverse("book-update", args=[self.book1.id])
         self.delete_url = reverse("book-delete", args=[self.book1.id])
 
+        # ✅ Login the client (this ensures tests run against the test DB)
+        self.client.login(username="testuser", password="password123")
     # -------------------------------
     # CRUD Tests
     # -------------------------------
