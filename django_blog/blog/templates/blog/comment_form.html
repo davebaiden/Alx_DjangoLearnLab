@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{% if comment %}Edit Comment{% else %}New Comment{% endif %}</title>
+  <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+</head>
+<body>
+  <a href="{% url 'post-detail' pk=comment.post.pk if comment else post_id %}">&larr; Back to post</a>
+
+  <h1>{% if comment %}Edit Comment{% else %}New Comment{% endif %}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if comment %}Update Comment{% else %}Post Comment{% endif %}</button>
+  </form>
+</body>
+</html>
