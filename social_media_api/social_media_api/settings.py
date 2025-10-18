@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     #local
     'accounts',
+    'posts',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -144,3 +146,12 @@ REST_FRAMEWORK = {
 # Media (for profile pictures)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+REST_FRAMEWORK.update({
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+    ],
+})
