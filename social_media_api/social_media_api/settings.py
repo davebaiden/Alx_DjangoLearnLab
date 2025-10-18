@@ -155,3 +155,4 @@ REST_FRAMEWORK.update({
         'rest_framework.filters.SearchFilter',
     ],
 })
+AUTH_USER_MODEL = 'accounts.CustomUser'
