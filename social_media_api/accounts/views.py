@@ -1,23 +1,20 @@
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
-from rest_framework import generics, status
-from rest_framework.views import APIView
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-
+from django.contrib.auth import get_user_model
 from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from .models import CustomUser
 
 User = get_user_model()
 
 
-# --------------------
-#  Authentication Views
-# --------------------
+# ---------- User Registration ----------
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
 
 
+# ---------- User Login ----------
 class LoginView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
@@ -27,51 +24,54 @@ class LoginView(APIView):
         return Response({'token': token.key}, status=status.HTTP_200_OK)
 
 
+# ---------- User Profile ----------
 class ProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
         return Response({
             'username': user.username,
             'email': user.email,
-            'bio': getattr(user, 'bio', ''),
-            'followers_count': user.followers.count(),
-            'following_count': user.following.count(),
+            'followers': user.followers.count(),
+            'following': user.following.count(),
         })
 
 
-# --------------------
-#  Follow System Views
-# --------------------
-class FollowUserView(APIView):
-    permission_classes = [IsAuthenticated]
+# ---------- Follow a User ----------
+class FollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        target = get_object_or_404(User, id=user_id)
-        if target == request.user:
-            return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            target_user = CustomUser.objects.get(id=user_id)
+            if target_user == request.user:
+                return Response({'detail': "You can't follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+            request.user.following.add(target_user)
+            return Response({'detail': f'You are now following {target_user.username}.'}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        target.followers.add(request.user)
-        return Response({"detail": f"You are now following {target.username}."}, status=status.HTTP_200_OK)
 
-
-class UnfollowUserView(APIView):
-    permission_classes = [IsAuthenticated]
+# ---------- Unfollow a User ----------
+class UnfollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        target = get_object_or_404(User, id=user_id)
-        if target == request.user:
-            return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            target_user = CustomUser.objects.get(id=user_id)
+            if target_user == request.user:
+                return Response({'detail': "You can't unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+            request.user.following.remove(target_user)
+            return Response({'detail': f'You have unfollowed {target_user.username}.'}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        target.followers.remove(request.user)
-        return Response({"detail": f"You have unfollowed {target.username}."}, status=status.HTTP_200_OK)
 
-
-class FollowingListView(APIView):
-    permission_classes = [IsAuthenticated]
+# ---------- List of Users the Current User Follows ----------
+class FollowingListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        following_qs = request.user.following.all()
-        data = [{"id": u.id, "username": u.username} for u in following_qs]
-        return Response(data)
+        following_users = request.user.following.all()
+        data =
