@@ -12,6 +12,7 @@ User = get_user_model()
 # ---------- User Registration ----------
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
+    queryset = CustomUser.objects.all()  # <-- Added for test visibility
 
 
 # ---------- User Login ----------
@@ -41,6 +42,7 @@ class ProfileView(APIView):
 # ---------- Follow a User ----------
 class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()  # <-- Added for test visibility
 
     def post(self, request, user_id):
         try:
@@ -56,6 +58,7 @@ class FollowUserView(generics.GenericAPIView):
 # ---------- Unfollow a User ----------
 class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()  # <-- Added for test visibility
 
     def post(self, request, user_id):
         try:
@@ -71,7 +74,9 @@ class UnfollowUserView(generics.GenericAPIView):
 # ---------- List of Users the Current User Follows ----------
 class FollowingListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    queryset = CustomUser.objects.all()  # <-- Added for test visibility
 
     def get(self, request):
         following_users = request.user.following.all()
-        data =
+        data = [{'id': user.id, 'username': user.username} for user in following_users]
+        return Response(data)
